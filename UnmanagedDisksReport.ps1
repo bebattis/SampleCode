@@ -62,51 +62,51 @@ function Calculate-MDType{
     $diskSA = Get-AzureRmStorageAccount | Where-Object { $_.StorageAccountName -eq $(($diskUri).Split('.')[0].Split('/')[2]) }
 
     if($diskSA.Sku.Tier -eq "Standard"){
-        if($diskSizeInGB -lt 32){
+        if($diskSizeInGB -le 32){
             $managedDiskType = "S4"
         }
-        elseif($diskSizeInGB -lt 64){
+        elseif($diskSizeInGB -le 64){
             $managedDiskType = "S6"
         }
-        elseif($diskSizeInGB -lt 128){
+        elseif($diskSizeInGB -le 128){
             $managedDiskType = "S10"
         }
-        elseif($diskSizeInGB -lt 512){
+        elseif($diskSizeInGB -le 512){
             $managedDiskType = "S20"
         }
-        elseif($diskSizeInGB -lt 1024){
+        elseif($diskSizeInGB -le 1024){
             $managedDiskType = "S30"
         }
-        elseif($diskSizeInGB -lt 2048){
+        elseif($diskSizeInGB -le 2048){
             $managedDiskType = "S40"
         }
-        elseif($diskSizeInGB -lt 4095){
+        elseif($diskSizeInGB -le 4095){
             $managedDiskType = "S50"
         }
     }
     elseif($diskSA.Sku.Tier -eq "Premium"){
-        if($diskSizeInGB -lt 32){
+        if($diskSizeInGB -le 32){
             $managedDiskType = "P4"
         }
-        elseif($diskSizeInGB -lt 64){
+        elseif($diskSizeInGB -le 64){
             $managedDiskType = "P6"
         }
-        elseif($diskSizeInGB -lt 128){
+        elseif($diskSizeInGB -le 128){
             $managedDiskType = "P10"
         }
-        elseif($diskSizeInGB -lt 256){
+        elseif($diskSizeInGB -le 256){
             $managedDiskType = "P15"
         }
-        elseif($diskSizeInGB -lt 512){
+        elseif($diskSizeInGB -le 512){
             $managedDiskType = "P20"
         }
-        elseif($diskSizeInGB -lt 1024){
+        elseif($diskSizeInGB -le 1024){
             $managedDiskType = "P30"
         }
-        elseif($diskSizeInGB -lt 2048){
+        elseif($diskSizeInGB -le 2048){
             $managedDiskType = "P40"
         }
-        elseif($diskSizeInGB -lt 4095){
+        elseif($diskSizeInGB -le 4095){
             $managedDiskType = "P50"
         }
     }
