@@ -14,7 +14,7 @@
     
  .EXAMPLE
 		UnmanagedDisksReport.ps1 `
-        -SubscriptionID "xxxxx-xxxxxx-xxxxxxx-xxxxx"
+        -SubscriptionID "xxxxx-xxxxxx-xxxxxxx-xxxxx" -ReportOutputFolder "C:\ScriptReports\"
    ===================================================================================================================================================================
 #>
 
@@ -32,14 +32,15 @@ if(-not(Test-Path -Path $ReportOutputFolder)){
 }
 
 try{
-    #Login to Azure
+    # login to Azure
+    # to skip logging into Azure for authentication sessions, comment out the next 5 lines
     $account = Login-AzureRmAccount
     if(!$account) {
         Throw "Could not login to Azure"
     }
     Write-Output "Successfully logged into Azure"
      
-    #Set context to the subscription
+    # set context to the subscription
     Select-AzureRMSubscription -SubscriptionName $SubscriptionID
     Write-Output "The subscription context is set to Subscription ID: $SubscriptionID"
 }
@@ -142,7 +143,7 @@ Foreach ($vm in $vms){
         $unmanagedVm | Add-Member -Type NoteProperty -Name OsDiskName -Value $vm.StorageProfile.OsDisk.Name
         $unmanagedVm | Add-Member -Type NoteProperty -Name OsDiskSizeGb -Value $vm.StorageProfile.OsDisk.DiskSizeGB
         $unmanagedVm | Add-Member -Type NoteProperty -Name OsDiskSA -Value ($vm.StorageProfile.OsDisk.Vhd.Uri).Split('.')[0].Split('/')[2]
-        $unmanagedVm | Add-Member -Type NoteProperty -Name OsDiskType -Value "[$(Calculate-MDType -diskUri $vm.StorageProfile.OsDisk.Vhd.Uri -diskSizeInGB $vm.StorageProfile.OsDisk.DiskSizeGB)] "
+        $unmanagedVm | Add-Member -Type NoteProperty -Name OsDiskType -Value "$(Calculate-MDType -diskUri $vm.StorageProfile.OsDisk.Vhd.Uri -diskSizeInGB $vm.StorageProfile.OsDisk.DiskSizeGB) "
         $unmanagedVm | Add-Member -Type NoteProperty -Name DataDiskNames -Value ""
         $unmanagedVm | Add-Member -Type NoteProperty -Name DataDiskLuns -Value ""
         $unmanagedVm | Add-Member -Type NoteProperty -Name DataDiskSizeGb -Value ""
