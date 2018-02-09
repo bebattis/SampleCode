@@ -46,11 +46,81 @@ try{
     Write-Output "The subscription context is set to Subscription ID: $SubscriptionID`n"
 }
 catch{
-    Write-Error "Error logging in subscription ID $SubscriptionID`n" -ErrorAction Stop
+    Write-Error "Error logging in subscription ID $SubscriptionID" -ErrorAction Stop
 }
 
 $timeStamp = Get-Date -Format yyyyMMddHHmm
 $VmOutputPath = "$ReportOutputFolder\VMUnmanagedDisk-$timeStamp.csv"
+
+# this function calculates the Managed Disk based upon the disk size and storage account type
+function EstimateMDType{
+
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("Standard","Premium")]
+        [string] $storageType,
+
+        [Parameter(Mandatory=$true)]
+        [int] $dataSizeInGB)
+
+    [single] $expectedGrowthMultiplier = 0.3
+    [string] $managedDiskType = ""
+    
+    $dataSizeInGB += [math]::Round($dataSizeInGB*$expectedGrowthMultiplier)
+    
+    
+    if($storageType -eq "Standard"){
+        if($dataSizeInGB -le 32){
+            $managedDiskType = "S4"
+        }
+        elseif($dataSizeInGB -le 64){
+            $managedDiskType = "S6"
+        }
+        elseif($dataSizeInGB -le 128){
+            $managedDiskType = "S10"
+        }
+        elseif($dataSizeInGB -le 512){
+            $managedDiskType = "S20"
+        }
+        elseif($dataSizeInGB -le 1024){
+            $managedDiskType = "S30"
+        }
+        elseif($dataSizeInGB -le 2048){
+            $managedDiskType = "S40"
+        }
+        elseif($dataSizeInGB -le 4095){
+            $managedDiskType = "S50"
+        }
+    }
+    elseif($storageType -eq "Premium"){
+        if($dataSizeInGB -le 32){
+            $managedDiskType = "P4"
+        }
+        elseif($dataSizeInGB -le 64){
+            $managedDiskType = "P6"
+        }
+        elseif($dataSizeInGB -le 128){
+            $managedDiskType = "P10"
+        }
+        elseif($dataSizeInGB -le 256){
+            $managedDiskType = "P15"
+        }
+        elseif($dataSizeInGB -le 512){
+            $managedDiskType = "P20"
+        }
+        elseif($dataSizeInGB -le 1024){
+            $managedDiskType = "P30"
+        }
+        elseif($dataSizeInGB -le 2048){
+            $managedDiskType = "P40"
+        }
+        elseif($dataSizeInGB -le 4095){
+            $managedDiskType = "P50"
+        }
+    }
+    
+    return $managedDiskType
+}
 
 # This function will gather detailed information about unmanaged disks
 function GetUnmanagedDiskDetails{
@@ -144,6 +214,7 @@ foreach($vm in $vms){
        
         # Gather unmnaged disk details and store as a PS custom object
         $osDiskDetails = GetUnmanagedDiskDetails $vm.StorageProfile.OsDisk.Vhd.Uri
+        $estimatedMDType = EstimateMDType -storageType $osDiskDetails.StorageType -dataSizeInGB $osDiskDetails.UsedSize
 
         $unmanDisk | Add-Member -Type NoteProperty -Name VhdUri -Value $osDiskDetails.Uri
         $unmanDisk | Add-Member -Type NoteProperty -Name StorageType -Value $osDiskDetails.StorageType
@@ -151,6 +222,7 @@ foreach($vm in $vms){
         $unmanDisk | Add-Member -Type NoteProperty -Name ProvisionedSizeInGb -Value $osDiskDetails.ProvisionedSize
         $unmanDisk | Add-Member -Type NoteProperty -Name UsedSizeInGb -Value $osDiskDetails.UsedSize
         $unmanDisk | Add-Member -Type NoteProperty -Name UsedDiskPercentage -Value $osDiskDetails.UsedDiskPercentage
+        $unmanDisk | Add-Member -Type NoteProperty -Name EstimatedMDType -Value $estimatedMDType     
 
         $unmanDisks += $unmanDisk
    }
@@ -171,6 +243,7 @@ foreach($vm in $vms){
 
             # Gather unmnaged disk details and store as a PS custom object
             $dataDiskDetails = GetUnmanagedDiskDetails $disk.Vhd.Uri
+            $estimatedMDType = EstimateMDType -storageType $dataDiskDetails.StorageType -dataSizeInGB $dataDiskDetails.UsedSize
 
             $unmanDisk | Add-Member -Type NoteProperty -Name VhdUri -Value $dataDiskDetails.Uri
             $unmanDisk | Add-Member -Type NoteProperty -Name StorageType -Value $dataDiskDetails.StorageType
@@ -178,6 +251,7 @@ foreach($vm in $vms){
             $unmanDisk | Add-Member -Type NoteProperty -Name ProvisionedSizeInGb -Value $dataDiskDetails.ProvisionedSize
             $unmanDisk | Add-Member -Type NoteProperty -Name UsedSizeInGb -Value $dataDiskDetails.UsedSize
             $unmanDisk | Add-Member -Type NoteProperty -Name UsedDiskPercentage -Value $dataDiskDetails.UsedDiskPercentage
+            $unmanDisk | Add-Member -Type NoteProperty -Name EstimatedMDType -Value $estimatedMDType
         
             $unmanDisks += $unmanDisk
         }
