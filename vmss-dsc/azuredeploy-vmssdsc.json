@@ -20,7 +20,7 @@
         "existingDomainName": {
             "type": "string",
             "metadata": {
-                "description": "Domain name of the exisiting RDS deployment"
+                "description": "Domain name of the exisiting AD infrastructure"
             }
         },
         "domainUsername": {
@@ -99,7 +99,8 @@
             "type": "string",
             "metadata": {
                 "description": "Virtual machine scale set name"
-            }
+            },
+            "maxLength": 9
         },
         "configurationUrl": {
             "type": "string",
