@@ -17,13 +17,6 @@
             },
             "defaultValue": "Standard_D2_v2"
         },
-        "cpuScaleThreshold": {
-            "type": "int",
-            "metadata": {
-                "description": "Average CPU percent threshold for autoscale"
-            },
-            "defaultValue": 70
-        },
         "existingDomainName": {
             "type": "string",
             "metadata": {
@@ -53,7 +46,7 @@
             "metadata": {
                 "description": "The password for the virtual machine"
             }
-        },   
+        },
         "existingAppGwResourceGroup": {
             "type": "string",
             "metadata": {
@@ -111,8 +104,9 @@
         "configurationUrl": {
             "type": "string",
             "metadata": {
-                "description": "The URL (can include SAS token) to the zip containing the DSC configuration and additional models (if any)"
-            }
+                "description": "The URL to the zip containing the DSC configuration and additional modules (if any)"
+            },
+            "defaultValue": "https://github.com/JasonBeck2/SampleCode/raw/master/vmss-dsc/DSC/Configuration.zip"
         }
     },
     "variables": {
@@ -191,18 +185,18 @@
                                     "typeHandlerVersion": "2.76",
                                     "autoUpgradeMinorVersion": true,
                                     "settings": {
-                                        "configuration":{
+                                        "configuration": {
                                             "url": "[parameters('configurationUrl')]",
                                             "script": "Configuration.ps1",
                                             "function": "DomainJoin"
                                         },
-                                        "configurationArguments":{
+                                        "configurationArguments": {
                                             "domainName": "[parameters('existingDomainName')]"
                                         }
                                     },
                                     "protectedSettings": {
                                         "configurationArguments": {
-                                            "adminCreds":{
+                                            "adminCreds": {
                                                 "userName": "[parameters('domainUsername')]",
                                                 "password": "[parameters('domainPassword')]"
                                             }
