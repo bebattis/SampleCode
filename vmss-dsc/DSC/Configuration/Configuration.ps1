@@ -20,7 +20,7 @@ configuration DomainJoin
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullorEmpty()]
-        [PSCredential]$certCreds,
+        [PSCredential]$certCreds
     ) 
     
     Import-DscResource -ModuleName xComputerManagement, CertificateDsc
