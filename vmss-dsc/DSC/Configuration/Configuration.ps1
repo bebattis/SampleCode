@@ -63,14 +63,14 @@ configuration DomainJoin
 
         Script DownloadCertificate
         {
-            GetScript = { return @{ 'Result' = (dir $localCertPath) } }
-            TestScript = { Test-Path $localCertPath }
+            GetScript = { return @{ 'Result' = (dir "C:\") } }
+            TestScript = { Test-Path $using:localCertPath }
             SetScript = {
                 if(!(Test-Path "C:\temp")){
                     New-Item -ItemType Directory -Force -Path "C:\temp"
                 }
                 $client = New-Object System.Net.WebClient
-                $client.DownloadFile($certUrl, $localCertPath)
+                $client.DownloadFile($using:certUrl, $using:localCertPath)
             }
             DependsOn = "[WindowsFeature]IIS"
         }

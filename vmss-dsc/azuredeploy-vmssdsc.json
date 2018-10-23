@@ -47,6 +47,24 @@
                 "description": "The password for the virtual machine"
             }
         },
+        "certPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for pfx certificate used to import to each scale set instance"
+            }
+        },
+        "certThumbprint": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Certificate thumprint"
+            }
+        },
+        "certSas": {
+            "type": "securestring",
+            "metadata": {
+                "description": "URL with SAS token to download the certificate to each scale set instance"
+            }
+        },
         "existingAppGwResourceGroup": {
             "type": "string",
             "metadata": {
@@ -200,7 +218,13 @@
                                             "adminCreds": {
                                                 "userName": "[parameters('domainUsername')]",
                                                 "password": "[parameters('domainPassword')]"
-                                            }
+                                            },
+                                            "certCreds": {
+                                                "userName": "unused",
+                                                "password": "[parameters('certPassword')]"
+                                            },
+                                            "certUrl": "[parameters('certSas')]",
+                                            "certThumbprint": "[parameters('certThumbprint')]"
                                         }
                                     }
                                 }
