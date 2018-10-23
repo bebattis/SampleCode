@@ -210,7 +210,8 @@
                                             "function": "DomainJoin"
                                         },
                                         "configurationArguments": {
-                                            "domainName": "[parameters('existingDomainName')]"
+                                            "domainName": "[parameters('existingDomainName')]",
+                                            "certThumbprint": "[parameters('certThumbprint')]"
                                         }
                                     },
                                     "protectedSettings": {
@@ -223,8 +224,7 @@
                                                 "userName": "unused",
                                                 "password": "[parameters('certPassword')]"
                                             },
-                                            "certUrl": "[parameters('certSas')]",
-                                            "certThumbprint": "[parameters('certThumbprint')]"
+                                            "certUrl": "[parameters('certSas')]"
                                         }
                                     }
                                 }
