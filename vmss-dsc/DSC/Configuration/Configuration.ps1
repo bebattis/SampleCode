@@ -10,15 +10,15 @@ configuration DomainJoin
         [ValidateNotNullorEmpty()]
         [PSCredential]$adminCreds,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
-        [String]$certUrl = "https://vmssdsc001.blob.core.windows.net/dsc/backend.pfx?st=2018-10-22T22%3A04%3A44Z&se=2018-11-23T22%3A04%3A00Z&sp=rl&sv=2018-03-28&sr=b&sig=YxCcTbsWSQnV6eVQNkjz7dDeguvt63oUZHCwDXuhyc0%3D",
+        [String]$certUrl,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [String]$certThumbprint,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
         [PSCredential]$certCreds
     ) 
@@ -27,8 +27,7 @@ configuration DomainJoin
 
     $domainCreds = New-Object System.Management.Automation.PSCredential("$domainName\$($adminCreds.UserName)", $adminCreds.Password)
 
-    #$certPassword = New-Object System.Management.Automation.PSCredential ("unnused", $certCreds.Password)
-    $certPassword = New-Object System.Management.Automation.PSCredential ("unnused", (ConvertTo-SecureString -String "P@ssw0rd12345" -Force -AsPlainText))
+    $certPassword = New-Object System.Management.Automation.PSCredential ("unnused", $certCreds.Password)
 
     $localCertPath = "C:\temp\cert.pfx"
    
@@ -77,7 +76,7 @@ configuration DomainJoin
 
         PfxImport ImportCertificate
         {
-            Thumbprint = "AB13159697214458FB53C6F5D180EA6C68E0BBE6" #$certThumbprint
+            Thumbprint = $certThumbprint
             Path = $localCertPath
             Location = 'LocalMachine'
             Store = 'My'
