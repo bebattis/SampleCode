@@ -126,13 +126,6 @@
                 "description": "The URL to the zip containing the DSC configuration and additional modules (if any)"
             },
             "defaultValue": "https://github.com/JasonBeck2/SampleCode/raw/master/vmss-dsc/DSC/Configuration.zip"
-        },
-        "configurationUrlSasToken": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Specifies the SAS token to access the URL defined by configurationUrl"
-            },
-            "defaultValue": ""
         }
     },
     "variables": {
@@ -231,8 +224,7 @@
                                                 "userName": "unused",
                                                 "password": "[parameters('certPassword')]"
                                             },
-                                            "certUrl": "[parameters('certSas')]",
-                                            "configurationUrlSasToken": "[parameters('configurationUrlSasToken')]"
+                                            "certUrl": "[parameters('certSas')]"
                                         }
                                     }
                                 }
