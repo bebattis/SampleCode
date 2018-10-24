@@ -59,10 +59,16 @@
                 "description": "Certificate thumprint"
             }
         },
-        "certSas": {
+        "certUrl": {
             "type": "securestring",
             "metadata": {
                 "description": "URL with SAS token to download the certificate to each scale set instance"
+            }
+        },
+        "sourceCodeUrl": {
+            "type": "securestring",
+            "metadata": {
+                "description": "URL with SAS token to download the source code to each scale set instance"
             }
         },
         "existingAppGwResourceGroup": {
@@ -224,7 +230,8 @@
                                                 "userName": "unused",
                                                 "password": "[parameters('certPassword')]"
                                             },
-                                            "certUrl": "[parameters('certSas')]"
+                                            "certUrl": "[parameters('certUrl')]",
+                                            "sourceCodeUrl": "[parameters('sourceCodeUrl')]"
                                         }
                                     }
                                 }

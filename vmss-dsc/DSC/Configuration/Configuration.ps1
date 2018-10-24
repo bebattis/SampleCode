@@ -76,6 +76,8 @@ configuration DomainJoin
                 if(!(Test-Path "C:\temp")){
                     New-Item -ItemType Directory -Force -Path "C:\temp"
                 }
+                # Use TLS 1.2
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
                 $client = New-Object System.Net.WebClient
                 $client.DownloadFile($using:certUrl, $using:localCertPath)
             }
@@ -100,6 +102,8 @@ configuration DomainJoin
                 if(!(Test-Path "C:\temp")){
                     New-Item -ItemType Directory -Force -Path "C:\temp"
                 }
+                # Use TLS 1.2
+                [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
                 $client = New-Object System.Net.WebClient
                 $client.DownloadFile($using:sourceCodeUrl, $using:localSourceCodePath)
             }
