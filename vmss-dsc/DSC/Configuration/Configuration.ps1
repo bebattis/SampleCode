@@ -20,16 +20,24 @@ configuration DomainJoin
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullorEmpty()]
-        [PSCredential]$certCreds
+        [PSCredential]$certCreds,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullorEmpty()]
+        [String]$sourceCodeUrl
     ) 
     
-    Import-DscResource -ModuleName xComputerManagement, CertificateDsc
+    Import-DscResource -ModuleName CertificateDsc, xComputerManagement, xWebAdministration
 
     $domainCreds = New-Object System.Management.Automation.PSCredential("$domainName\$($adminCreds.UserName)", $adminCreds.Password)
 
     $certPassword = New-Object System.Management.Automation.PSCredential ("unnused", $certCreds.Password)
 
     $localCertPath = "C:\temp\cert.pfx"
+
+    $localSourceCodePath = "C:\temp\sourceCode.zip"
+
+    $extractSourceCodePath = "C:\ExtractionDirectory"
    
     Node localhost
     {
@@ -62,7 +70,7 @@ configuration DomainJoin
 
         Script DownloadCertificate
         {
-            GetScript = { return @{ 'Result' = (dir "C:\") } }
+            GetScript = { return @{ 'Result' = (Get-ChildItem Cert:\LocalMachine\My) } }
             TestScript = { Test-Path $using:localCertPath }
             SetScript = {
                 if(!(Test-Path "C:\temp")){
@@ -82,6 +90,27 @@ configuration DomainJoin
             Store = 'My'
             Credential = $certPassword
             DependsOn = "[Script]DownloadCertificate"
+        }
+
+        Script DownloadSourceCode
+        {
+            GetScript = { return @{ 'Result' = (dir "C:\") } }
+            TestScript = { Test-Path $using:localSourceCodePath }
+            SetScript = {
+                if(!(Test-Path "C:\temp")){
+                    New-Item -ItemType Directory -Force -Path "C:\temp"
+                }
+                $client = New-Object System.Net.WebClient
+                $client.DownloadFile($using:sourceCodeUrl, $using:localSourceCodePath)
+            }
+            DependsOn = "[PfxImport]ImportCertificate"
+        }
+
+        Archive ExtractSourceCode
+        {
+            Destination = $extractSourceCodePath
+            Path = $localSourceCodePath
+            DependsOn = "[Script]DownloadSourceCode"
         }
    }
 }
