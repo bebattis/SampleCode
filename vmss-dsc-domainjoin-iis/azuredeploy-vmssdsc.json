@@ -17,7 +17,7 @@
             },
             "defaultValue": "Standard_D2_v2"
         },
-        "existingDomainName": {
+        "domainName": {
             "type": "string",
             "metadata": {
                 "description": "Domain name of the exisiting AD infrastructure"
@@ -47,76 +47,40 @@
                 "description": "The password for the local administrator of the virtual machine"
             }
         },
-        "certPassword": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Password for pfx certificate used to import to each scale set instance"
-            }
-        },
-        "certThumbprint": {
-            "type": "string",
-            "metadata": {
-                "description": "Certificate thumprint"
-            }
-        },
-        "certUrl": {
-            "type": "securestring",
-            "metadata": {
-                "description": "URL with SAS token to download the certificate to each scale set instance"
-            }
-        },
-        "sourceCodeUrl": {
-            "type": "securestring",
-            "metadata": {
-                "description": "URL with SAS token to download the source code to each scale set instance"
-            }
-        },
         "existingAppGwResourceGroup": {
             "type": "string",
             "metadata": {
-                "description": "Application Gateway resource group name"
+                "description": "Existing Application Gateway resource group name"
             }
         },
         "existingAppGwName": {
             "type": "string",
             "metadata": {
-                "description": "Application Gateway name"
+                "description": "Existing Application Gateway name"
             }
         },
         "existingAppGwBackEndPoolName": {
             "type": "string",
             "metadata": {
-                "description": "Application Gateway back end pool name"
+                "description": "Existing Application Gateway back end pool name"
             }
         },
         "existingVnetResourceGroup": {
             "type": "string",
             "metadata": {
-                "description": "VNET RG name"
+                "description": "Existing virtual network resource group name"
             }
         },
         "existingVnetName": {
             "type": "string",
             "metadata": {
-                "description": "VNET name"
+                "description": "Existing virtual network name"
             }
         },
         "existingSubnetName": {
             "type": "string",
             "metadata": {
-                "description": "Subnet name"
-            }
-        },
-        "existingManagedImageResourceGroup": {
-            "type": "string",
-            "metadata": {
-                "description": "Managed custom image resource group name"
-            }
-        },
-        "existingManagedImageName": {
-            "type": "string",
-            "metadata": {
-                "description": "Managed custom image name"
+                "description": "Existing subnet name"
             }
         },
         "scaleSetName": {
@@ -131,7 +95,7 @@
             "metadata": {
                 "description": "The URL to the zip containing the DSC configuration and additional modules (if any)"
             },
-            "defaultValue": "https://github.com/JasonBeck2/SampleCode/raw/master/vmss-dsc/DSC/Configuration.zip"
+            "defaultValue": "https://github.com/JasonBeck2/SampleCode/raw/master/vmss-dsc-domainjoin-iis/DSC/Configuration.zip"
         }
     },
     "variables": {
@@ -141,7 +105,12 @@
         "nicName": "[concat(variables('namingInfix'), '-nic')]",
         "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
         "location": "[resourceGroup().location]",
-        "managedImageId": "[resourceId(parameters('existingManagedImageResourceGroup'), 'Microsoft.Compute/images', parameters('existingManagedImageName'))]"
+        "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+        }
     },
     "resources": [
         {
@@ -166,9 +135,7 @@
                             "createOption": "FromImage",
                             "caching": "ReadWrite"
                         },
-                        "imageReference": {
-                            "id": "[variables('managedImageId')]"
-                        }
+                        "imageReference": "[variables('imageReference')]"
                     },
                     "osProfile": {
                         "computerNamePrefix": "[parameters('scaleSetName')]",
@@ -203,7 +170,7 @@
                     "extensionProfile": {
                         "extensions": [
                             {
-                                "name": "dscdomainjoin",
+                                "name": "dscdomainjoiniis",
                                 "properties": {
                                     "publisher": "Microsoft.Powershell",
                                     "type": "DSC",
@@ -213,11 +180,10 @@
                                         "configuration": {
                                             "url": "[parameters('configurationUrl')]",
                                             "script": "Configuration.ps1",
-                                            "function": "DomainJoin"
+                                            "function": "DomainJoinIIS"
                                         },
                                         "configurationArguments": {
-                                            "domainName": "[parameters('existingDomainName')]",
-                                            "certThumbprint": "[parameters('certThumbprint')]"
+                                            "domainName": "[parameters('domainName')]"
                                         }
                                     },
                                     "protectedSettings": {
@@ -225,13 +191,7 @@
                                             "adminCreds": {
                                                 "userName": "[parameters('domainUsername')]",
                                                 "password": "[parameters('domainPassword')]"
-                                            },
-                                            "certCreds": {
-                                                "userName": "unused",
-                                                "password": "[parameters('certPassword')]"
-                                            },
-                                            "certUrl": "[parameters('certUrl')]",
-                                            "sourceCodeUrl": "[parameters('sourceCodeUrl')]"
+                                            }
                                         }
                                     }
                                 }
