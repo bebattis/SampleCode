@@ -16,6 +16,9 @@ $subnetName = 'yoursubnetname'
 #Provide the name of the virtual machine
 $virtualMachineName = 'yourVMName'
 
+#Availability set name
+$avSetName = 'youravsetname'
+
 #Provide the size of the virtual machine
 #e.g. Standard_DS3
 #Get all the vm sizes in a region using below script:
@@ -28,8 +31,11 @@ Select-AzureRmSubscription -SubscriptionId $SubscriptionId
 #Get the existing OS disk
 $osDisk = Get-AzureRmDisk -ResourceGroupName $resourceGroupName -Name $osDiskName
 
+#Get availability set
+$avSet = Get-AzureRmAvailabilitySet -ResourceGroupName $resourceGroupName -Name $avSetName
+
 #Initialize virtual machine configuration
-$VirtualMachine = New-AzureRmVMConfig -VMName $virtualMachineName -VMSize $virtualMachineSize
+$VirtualMachine = New-AzureRmVMConfig -VMName $virtualMachineName -VMSize $virtualMachineSize -AvailabilitySetId $avSet.Id
 
 #Use the Managed Disk Resource Id to attach it to the virtual machine. Please change the OS type to linux if OS disk has linux OS
 $VirtualMachine = Set-AzureRmVMOSDisk -VM $VirtualMachine -ManagedDiskId $osDisk.Id -CreateOption Attach -Windows
