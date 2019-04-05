@@ -95,7 +95,7 @@
             "metadata": {
                 "description": "The URL to the zip containing the DSC configuration and additional modules (if any)"
             },
-            "defaultValue": "https://github.com/JasonBeck2/SampleCode/raw/master/vmss-dsc-domainjoin-iis/DSC/Configuration.zip"
+            "defaultValue": "https://github.com/bebattis/SampleCode/raw/master/vmss-dsc-domainjoin-iis/DSC/Configuration.zip"
         }
     },
     "variables": {
